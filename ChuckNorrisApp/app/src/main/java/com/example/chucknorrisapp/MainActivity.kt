@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
         val chuckJoke = jokesList.jokes
         //Log.i("Jokes Object", chuckJoke.toString())
         CN_jokes_list.layoutManager = LinearLayoutManager(this)
+        CN_jokes_list.adapter = JokeAdapter(chuckJoke, this)
     }
 
 }
