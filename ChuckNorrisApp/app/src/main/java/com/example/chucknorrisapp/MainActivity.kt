@@ -7,6 +7,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 import values.jokesList
 import androidx.recyclerview.widget.LinearLayoutManager
 
+import retrofit2.http.GET
+import io.reactivex.Single
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,6 +32,11 @@ class MainActivity : AppCompatActivity() {
         //Log.i("Jokes Object", chuckJoke.toString())
         CN_jokes_list.layoutManager = LinearLayoutManager(this)
         CN_jokes_list.adapter = JokeAdapter(chuckJoke, this)
+    }
+
+    interface JokeApiService {
+        @GET("my/api/path")
+        fun giveMeAJoke(): Single<Joke>
     }
 
 
