@@ -3,8 +3,6 @@ package com.example.chucknorrisapp
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-//import kotlinx.serialization.*
-
 @Serializable
 data class Joke (val categories: List<String>,
                  @SerialName("created_at")

@@ -7,8 +7,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import values.jokesList
 import androidx.recyclerview.widget.LinearLayoutManager
 
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,5 +30,7 @@ class MainActivity : AppCompatActivity() {
         CN_jokes_list.layoutManager = LinearLayoutManager(this)
         CN_jokes_list.adapter = JokeAdapter(chuckJoke, this)
     }
+
+
 
 }

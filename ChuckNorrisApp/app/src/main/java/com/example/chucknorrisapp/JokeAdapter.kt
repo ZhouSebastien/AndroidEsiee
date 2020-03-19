@@ -4,11 +4,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
-//import android.view.View
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.joke_layout.view.*
-import values.jokesList.jokes
 
 class JokeAdapter(private val items: List<Joke>, private val context: Context):  RecyclerView.Adapter<JokeAdapter.JokeViewHolder>(){
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JokeViewHolder {
@@ -20,7 +17,7 @@ class JokeAdapter(private val items: List<Joke>, private val context: Context): 
     }
 
     override fun onBindViewHolder(holder: JokeViewHolder, position: Int) {
-        holder.tvJoke.tv_joke_item.text = jokes[position]
+        holder.tvJoke.tv_joke_item.text = items[position].value
     }
 
     class JokeViewHolder(linearView: LinearLayout): RecyclerView.ViewHolder(linearView) {
