@@ -9,6 +9,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 
 import retrofit2.http.GET
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -17,7 +18,7 @@ import okhttp3.MediaType
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.create
-
+import java.util.concurrent.TimeUnit
 
 
 interface JokeApiService {
@@ -53,10 +54,16 @@ class MainActivity : AppCompatActivity() {
         val jokeService = JokeApiServiceFactory.make()
         val jokeSubscriber = jokeService
             .giveMeAJoke()
+            .delay(250, TimeUnit.MILLISECONDS)
+            .repeat(10)
             .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onError = {throwable: Throwable -> Log.e("jokeSubscribeError", "Joke not found: ($throwable)") },
-                onSuccess = {joke: Joke -> Log.i("JokeSubscribeSucces", "joke added: ($joke)"); adapter.addJoke(joke)}
+                onNext = {joke: Joke ->
+                    Log.i("JokeSubscribeSucces", "joke added: ($joke)")
+                    adapter.addJoke(joke)
+                }
             )
         this.disposable.add(jokeSubscriber)
     }
