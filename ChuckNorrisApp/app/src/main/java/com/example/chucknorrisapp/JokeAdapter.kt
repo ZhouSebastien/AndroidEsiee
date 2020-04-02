@@ -7,7 +7,9 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.joke_layout.view.*
 
-class JokeAdapter(private var items: List<Joke>, private val context: Context):  RecyclerView.Adapter<JokeAdapter.JokeViewHolder>(){
+class JokeAdapter(private var items: List<Joke>,
+                  private val context: Context,
+                  val onBottomReached: (JokeAdapter) -> Unit?):  RecyclerView.Adapter<JokeAdapter.JokeViewHolder>(){
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JokeViewHolder {
         return JokeViewHolder(LayoutInflater.from(context).inflate(R.layout.joke_layout, parent, false) as LinearLayout)
     }
@@ -26,8 +28,7 @@ class JokeAdapter(private var items: List<Joke>, private val context: Context): 
 
     fun addJoke(item: Joke) {
         val tempList = items.toMutableList()
-        tempList.add(0, item)
+        tempList.add(item)
         items = tempList.toList()
-        //this.notifyItemInserted(0)
     }
 }

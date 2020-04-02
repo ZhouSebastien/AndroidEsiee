@@ -3,6 +3,10 @@ package com.example.chucknorrisapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
+import android.view.ViewTreeObserver
+import android.widget.ProgressBar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -45,27 +49,45 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val adapter = JokeAdapter(mutableListOf(), this)
+        val progressBar: ProgressBar = findViewById(R.id.progress_bar)
+
+        val adapter = JokeAdapter(mutableListOf(), this){
+            val jokeService = JokeApiServiceFactory.make()
+            val jokeSubscriber = jokeService
+                .giveMeAJoke()
+                .delay(250, TimeUnit.MILLISECONDS)
+                .repeat(10)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe{progressBar.visibility = VISIBLE}
+                .doOnTerminate{
+                    val jokeRecycler = findViewById<RecyclerView>(R.id.CN_jokes_list)
+                    jokeRecycler.adapter?.notifyDataSetChanged()
+                    progressBar.visibility = INVISIBLE
+                }
+                .subscribeBy(
+                    onError = {throwable: Throwable -> Log.e("jokeSubscribeError", "Joke not found: ($throwable)") },
+                    onNext = {joke: Joke ->
+                        Log.i("JokeSubscribeSuccess", "joke added: ($joke)")
+                        it.addJoke(joke)
+                    }
+                )
+            this.disposable.add(jokeSubscriber)
+            Unit
+        }
+
         val layoutManager = LinearLayoutManager(this)
         val jokeRecycler = findViewById<RecyclerView>(R.id.CN_jokes_list)
         jokeRecycler.layoutManager = layoutManager
         jokeRecycler.adapter = adapter
 
-        val jokeService = JokeApiServiceFactory.make()
-        val jokeSubscriber = jokeService
-            .giveMeAJoke()
-            .delay(250, TimeUnit.MILLISECONDS)
-            .repeat(10)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = {throwable: Throwable -> Log.e("jokeSubscribeError", "Joke not found: ($throwable)") },
-                onNext = {joke: Joke ->
-                    Log.i("JokeSubscribeSucces", "joke added: ($joke)")
-                    adapter.addJoke(joke)
-                }
-            )
-        this.disposable.add(jokeSubscriber)
+        adapter.onBottomReached(adapter)
+        jokeRecycler.viewTreeObserver.addOnScrollChangedListener(ViewTreeObserver.OnScrollChangedListener {
+            if(!jokeRecycler.canScrollVertically(1)){
+                adapter.onBottomReached(adapter)
+            }
+        })
+
     }
 
     override fun onDestroy() {
