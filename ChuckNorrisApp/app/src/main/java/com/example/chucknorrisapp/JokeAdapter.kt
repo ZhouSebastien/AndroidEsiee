@@ -31,4 +31,8 @@ class JokeAdapter(private var items: List<Joke>,
         tempList.add(item)
         items = tempList.toList()
     }
+
+    fun getJokes(): List<Joke> {
+        return items
+    }
 }

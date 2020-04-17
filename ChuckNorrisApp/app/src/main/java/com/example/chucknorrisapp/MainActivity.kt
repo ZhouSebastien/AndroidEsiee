@@ -18,6 +18,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
+import kotlinx.serialization.list
 import okhttp3.MediaType
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -45,35 +47,49 @@ class MainActivity : AppCompatActivity() {
 
     private val disposable = CompositeDisposable()
 
+    private var adapter = JokeAdapter(mutableListOf(), this){}
+
+    private val SAVED_JOKE_KEY = "joke_key"
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val progressBar: ProgressBar = findViewById(R.id.progress_bar)
-
-        val adapter = JokeAdapter(mutableListOf(), this){
-            val jokeService = JokeApiServiceFactory.make()
-            val jokeSubscriber = jokeService
-                .giveMeAJoke()
-                .delay(250, TimeUnit.MILLISECONDS)
-                .repeat(10)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe{progressBar.visibility = VISIBLE}
-                .doOnTerminate{
-                    val jokeRecycler = findViewById<RecyclerView>(R.id.CN_jokes_list)
-                    jokeRecycler.adapter?.notifyDataSetChanged()
-                    progressBar.visibility = INVISIBLE
+        if (savedInstanceState != null) {
+            savedInstanceState.getString(SAVED_JOKE_KEY)?.let {
+                val jokeList = Json(JsonConfiguration.Stable).parse(Joke.serializer().list, it)
+                jokeList.forEach{
+                    adapter.addJoke(it)
                 }
-                .subscribeBy(
-                    onError = {throwable: Throwable -> Log.e("jokeSubscribeError", "Joke not found: ($throwable)") },
-                    onNext = {joke: Joke ->
-                        Log.i("JokeSubscribeSuccess", "joke added: ($joke)")
-                        it.addJoke(joke)
+            }
+        }
+        else {
+            adapter = JokeAdapter(mutableListOf(), this){
+                val progressBar: ProgressBar = findViewById(R.id.progress_bar)
+                val jokeService = JokeApiServiceFactory.make()
+                val jokeSubscriber = jokeService
+                    .giveMeAJoke()
+                    .delay(250, TimeUnit.MILLISECONDS)
+                    .repeat(10)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe{progressBar.visibility = VISIBLE}
+                    .doOnTerminate{
+                        val jokeRecycler = findViewById<RecyclerView>(R.id.CN_jokes_list)
+                        jokeRecycler.adapter?.notifyDataSetChanged()
+                        progressBar.visibility = INVISIBLE
                     }
-                )
-            this.disposable.add(jokeSubscriber)
-            Unit
+                    .subscribeBy(
+                        onError = {throwable: Throwable -> Log.e("jokeSubscribeError", "Joke not found: ($throwable)") },
+                        onNext = {joke: Joke ->
+                            Log.i("JokeSubscribeSuccess", "joke added: ($joke)")
+                            it.addJoke(joke)
+                        }
+                    )
+                this.disposable.add(jokeSubscriber)
+                Unit
+            }
         }
 
         val layoutManager = LinearLayoutManager(this)
@@ -88,6 +104,14 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val json = Json(JsonConfiguration.Stable)
+        val jokeList = adapter.getJokes()
+        val jokesValue = json.stringify(Joke.serializer().list, jokeList)
+        outState.putString(SAVED_JOKE_KEY, jokesValue)
     }
 
     override fun onDestroy() {
