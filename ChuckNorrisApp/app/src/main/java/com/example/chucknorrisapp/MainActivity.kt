@@ -70,8 +70,8 @@ class MainActivity : AppCompatActivity() {
                 val jokeService = JokeApiServiceFactory.make()
                 val jokeSubscriber = jokeService
                     .giveMeAJoke()
-                    .delay(250, TimeUnit.MILLISECONDS)
-                    .repeat(10)
+                    .delay(100, TimeUnit.MILLISECONDS)
+                    .repeat(15)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe{progressBar.visibility = VISIBLE}

@@ -1,13 +1,44 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<?xml version = "1.0" encoding = "utf-8"?>
+
+<merge tools:parentTag = "androidx.constraintlayout.widget.ConstraintLayout"
+    xmlns:tools = "http://schemas.android.com/tools"
+    xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:app = "http://schemas.android.com/apk/res-auto">
+
 
     <TextView
-        android:id="@+id/tv_joke_item"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:padding="20px"/>
+        android:id = "@+id/tv_joke_item"
+        android:layout_margin = "5dp"
+        android:paddingRight="5dp"
+        android:layout_height = "wrap_content"
+        android:layout_width = "wrap_content"
+        android:textSize = "50px"
+        app:layout_constrainedWidth = "true"
+        app:layout_constraintBottom_toBottomOf = "parent"
+        app:layout_constraintStart_toStartOf = "parent"
+        app:layout_constraintEnd_toStartOf = "@id/share_button"
+        app:layout_constraintTop_toTopOf = "parent" />
 
-</LinearLayout>
+    <ImageButton
+        android:id = "@+id/save_button"
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:layout_margin = "5dp"
+        android:background = "@android:color/transparent"
+        android:src = "@drawable/save_icon"
+        app:layout_constraintBottom_toBottomOf = "parent"
+        app:layout_constraintRight_toRightOf = "parent"
+        app:layout_constraintTop_toTopOf = "parent"/>
+
+    <ImageButton
+        android:id = "@+id/share_button"
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:layout_margin = "5dp"
+        android:background = "@android:color/transparent"
+        android:src = "@drawable/share_icon"
+        app:layout_constraintBottom_toBottomOf = "parent"
+        app:layout_constraintRight_toLeftOf = "@+id/save_button"
+        app:layout_constraintTop_toTopOf = "parent" />
+
+</merge>

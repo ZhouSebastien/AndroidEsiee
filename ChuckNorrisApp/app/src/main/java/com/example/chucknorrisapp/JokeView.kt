@@ -5,8 +5,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import kotlinx.android.synthetic.main.joke_layout.view.*
 
 class JokeView @JvmOverloads constructor(
     context: Context, attributeS: AttributeSet? = null
@@ -18,6 +18,7 @@ class JokeView @JvmOverloads constructor(
 
     data class Model(val value: String)
     fun setUpView(model: Model) {
+        var tv_joke_item = findViewById<TextView>(R.id.tv_joke_item)
         tv_joke_item.text = model.value
     }
 }
