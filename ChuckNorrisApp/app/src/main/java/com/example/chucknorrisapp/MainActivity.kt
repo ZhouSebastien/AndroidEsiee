@@ -9,6 +9,7 @@ import android.view.ViewTreeObserver
 import android.widget.ProgressBar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.gopro.chucknorrisjokes.JokeTouchHelper
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 import retrofit2.http.GET
@@ -103,6 +104,12 @@ class MainActivity : AppCompatActivity() {
                 adapter.onBottomReached(adapter)
             }
         })
+
+        val jokeTouchHelper = JokeTouchHelper (
+            { pos -> adapter.onJokeRemoved(pos) },
+            { pos, dest -> adapter.onItemMoved(pos, dest)}
+        )
+        jokeTouchHelper.attachToRecyclerView(jokeRecycler)
 
     }
 
